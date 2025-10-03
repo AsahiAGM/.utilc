@@ -1,0 +1,37 @@
+int _ascending(const int *a, const int *b){
+    return (*a - *b);
+}
+
+void _swap_(int* a, int* b){
+    int buf;
+
+    buf = *a;
+    *a = *b;
+    *b = buf;
+}
+
+void _qsort_(int* src, int left, int right, int *(cmp)(const int*, const int*)){
+    int pivotIdx;
+    int pivot;
+    int l;
+    int r;
+
+    pivotIdx = left;
+    pivot = src[pivotIdx];
+    l = left + 1;
+    r = right;
+    if (left>=right)
+        return ;
+    while (l <= r){
+        while (l <= right && cmp(&src[l], &pivot) >= 0)
+            l++;
+        while (r > left  && cmp(&src[l], &pivot) < 0)
+            r--;
+        if (l < r)
+            _swap_(&src[l],&src[r]);
+    }
+    src[left] = src[r];
+    src[r] = pivot;
+    _qsort_(src, left, r - 1, cmp);
+    _qsort_(src, r + 1, right, cmp);
+}

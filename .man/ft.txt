@@ -1,0 +1,7 @@
+man "ft"
+--syntax--
+ft [problems name]
+--param--
+:problems name -- that is name you going to solute probrem in 42
+
+enjoy :)

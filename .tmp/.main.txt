@@ -1,0 +1,10 @@
+#include "/home/asahi/.utilc/util.h"
+
+/*paste function prototype*/;
+
+int main(void){
+    printf("-----%s-----\n", __SCRIPT__);
+	// your code
+
+	return (0);
+} 

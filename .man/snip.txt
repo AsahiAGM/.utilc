@@ -1,0 +1,9 @@
+man "snip"
+--syntax--
+snip [snippet] [line number] [target file]
+--param--
+:snippet     -- function or sequences name
+:line number -- The line number where you going to insert the snippet
+:snippet     -- target file name
+
+enjoy :)
