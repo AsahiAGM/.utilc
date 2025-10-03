@@ -1,4 +1,4 @@
-#include "/home/asahi/.utilc/util.h"
+#include {UTILC}
 
 /*paste function prototype*/;
 

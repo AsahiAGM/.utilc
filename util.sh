@@ -14,9 +14,16 @@ ft()
     number="$1"
     probname="$2"
     mkdir "$number"
+
+    # ft file
     cat ~/.utilc/.tmp/tmp.txt > "$number"/"$probname".c
+
+    # .main file
     echo -e "#define __SCRIPT__ \"$probname.c\"" > "$number"/.main.c
-    cat ~/.utilc/.tmp/.main.txt >> "$number"/.main.c
+    {
+        echo "#define __SCRIPT__ \"$probname.c\""
+        sed "s|{UTILC}|\"$HOME/.utilc/util.h\"|g" ~/.utilc/.tmp/.main.txt
+    } > "$number/.main.c"
 }
 
 ftall()
