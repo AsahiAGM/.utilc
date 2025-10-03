@@ -38,8 +38,8 @@ If you prefer to manually clone:
 ```bash
 git clone https://github.com/AsahiAGM/.utilc.git ~/.utilc
 ```
-bash ~/.utilc/setup.sh          # read-only usage
-bash ~/.utilc/setup.sh --dev    # development mode
+- bash ~/.utilc/setup.sh          # read-only usage
+- bash ~/.utilc/setup.sh --dev    # development mode
 
 Notes:
 - ~/.bashrc will be automatically updated to source util.sh
