@@ -1,7 +1,8 @@
 man "ft"
 --syntax--
-ft [problems name]
+ft [ex number] [problems name]
 --param--
+:ex number     -- that is number of probrem
 :problems name -- that is name you going to solute probrem in 42
 
 enjoy :)

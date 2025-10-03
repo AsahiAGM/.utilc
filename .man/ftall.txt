@@ -1,0 +1,11 @@
+man "ftall"
+--summary--
+all folder gcc compile and run
+--syntax--
+ftall <option>
+--param--
+no param
+--option--
+-v : --valgrind ... run with valgrind
+
+enjoy :)

@@ -1,13 +1,16 @@
 #ifndef UTIL_H
 # define UTIL_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>
-#include "listnode.h"
+
+struct ListNode {
+    int val;
+    struct ListNode *next;
+};
 
 void print_str(const char *arr, int size);
 void print_nums(const int *arr, int size);

@@ -1,0 +1,9 @@
+man "valgc"
+--summary--
+gcc compile and run with valgrind 
+--syntax--
+valgc [target]
+--param--
+:target -- The file name to compile and run.
+
+enjoy :)
