@@ -15,7 +15,7 @@ The command to call a snippet is snip. For usage, use -h or --help.
 1. Default (read-only usage)
 To install for read-only usage (the `.git` directory will be removed):
 
-bash <(curl -s https://raw.githubusercontent.com/AsahiAGM/.utilc/main/setup.sh)
+```bash <(curl -s https://raw.githubusercontent.com/AsahiAGM/.utilc/main/setup.sh)```
 
 - ft, valgc, snip, etc. are immediately available
 - .utilc .git directory is removed to prevent accidental pushes
@@ -23,7 +23,7 @@ bash <(curl -s https://raw.githubusercontent.com/AsahiAGM/.utilc/main/setup.sh)
 2. Development mode (--dev)
 To participate in development and contribute new features:
 
-bash <(curl -s https://raw.githubusercontent.com/AsahiAGM/.utilc/main/setup.sh) --dev
+```bash <(curl -s https://raw.githubusercontent.com/AsahiAGM/.utilc/main/setup.sh) --dev```
 
 - .git is preserved for editing and pushing changes
 - You can add new snippets or modify util.sh
