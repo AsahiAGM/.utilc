@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "listnode.h"
+
+typedef struct s_lnode {
+    int val;
+    struct s_lNode *next;
+} _listNode;
 
 void print_str(const char *arr, int size)
 {
@@ -34,7 +38,7 @@ void arrs_free(void **arrs, size_t arrssize)
     free(arrs);
 }
 
-void print_llist(struct ListNode* list)
+void print_llist(_listNode* list)
 {
     printf("{");
     while(list)
@@ -47,10 +51,10 @@ void print_llist(struct ListNode* list)
     printf("}\n");
 }
 
-void list_free(struct ListNode* list)
+void list_free(_listNode* list)
 {
-    struct ListNode* current = list;
-    struct ListNode* nextNode;
+    _listNode* current = list;
+    _listNode* nextNode;
     while(current)
     {
         nextNode = current->next;

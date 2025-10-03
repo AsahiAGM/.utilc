@@ -1,4 +1,6 @@
 man "snip"
+--summary--
+insert snippet which any function or sequences
 --syntax--
 snip [snippet] [line number] [target file]
 --param--

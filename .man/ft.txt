@@ -1,4 +1,6 @@
 man "ft"
+--summary--
+make working directory "ex" and files
 --syntax--
 ft [ex number] [problems name]
 --param--

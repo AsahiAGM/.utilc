@@ -5,5 +5,7 @@ gcc compile and run with valgrind
 valgc [target]
 --param--
 :target -- The file name to compile and run.
+--hint--
+- If no parameters are given, the files in the current directory are searched for.
 
 enjoy :)

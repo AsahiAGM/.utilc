@@ -7,11 +7,6 @@
 #include <math.h>
 #include <unistd.h>
 
-struct ListNode {
-    int val;
-    struct ListNode *next;
-};
-
 void print_str(const char *arr, int size);
 void print_nums(const int *arr, int size);
 void arrs_free(void **arrs, size_t arrssize);
