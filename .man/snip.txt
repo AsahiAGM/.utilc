@@ -11,9 +11,19 @@ snip [snippet] [line number] [target file] [options]
 :target file  -- target file name
 
 --options--
- -l, --list   -- show available snippets
- -e, --edit   -- open snippet file with vim
- -add         -- create new snippet file
- -h, --help   -- show this help
+ -l, --list                    -- show available snippets
+ -e, --edit [filename]         -- open snippet file with vim
+ -add [targetpath] [filename]  -- create new snippet file
+ -d, --delete                  -- Delete a specified snippet
+ -f, --find                    -- Search for snippets by keyword
+ -h, --help                    -- show this help
+
+--hint--
+- For insertion, specify the snippet name, line number, and target file.
+- When adding, provide a source file and new snippet name.
+- Listing shows all snippets in the snippets folder.
+- Editing opens the snippet in vim.
+- Deletion removes the snippet permanently.
+- Searching lists snippets whose filename or content matches the keyword.
 
 enjoy :)

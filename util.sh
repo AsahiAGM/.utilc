@@ -144,19 +144,14 @@ valgc()
 
 snip()
 {
-    if [[ $1 == "-h" || $1 == "--help" ]]; then
-        cat ~/.utilc/.man/snip.txt
-        return 0
-    fi
-    if [[ $# -ne 3 ]]; then
-        echo "syntax ERROR. please read this command help --> snip -h or --help"
-        return 1
-    fi
-
     # switch option
     case "$1" in
+        -h|--help)
+            cat ~/.utilc/.man/snip.txt
+            return 0
+            ;;
         -l|--list)
-            ls ~/.utilc/snippets
+            ls ~/.utilc/snippets | xargs -n 1 basename -s .txt
             return 0
             ;;
         -e|--edit)
@@ -164,16 +159,46 @@ snip()
                 echo "please specify snippet name"
                 return 1
             fi
-            vim ~/.utilc/snippets/"$2".c
+            vim ~/.utilc/snippets/"$2".txt
             return 0
             ;;
         -add)
-            if [[ -z $2 ]]; then
-                echo "please specify new snippet name"
+            if [[ $# -lt 3 ]]; then
+                echo "please target filename and specify new snippet name"
                 return 1
             fi
-            cp ~/.utilc/.tmp/tmp.txt ~/.utilc/snippets/"$2".c
-            vim ~/.utilc/snippets/"$2".c
+            cp "$2" ~/.utilc/snippets/"$3".txt
+            vim ~/.utilc/snippets/"$3".txt
+            return 0
+            ;;
+        -d|--delete)
+            if [[ $# -lt 2 ]]; then
+                echo "Please specify the snippet name to delete."
+                return 1
+            fi
+            snippet_name="$2"
+            snippet_path="$HOME/.utilc/snippets/${snippet_name}.txt"
+            if [[ -f "$snippet_path" ]]; then
+                rm "$snippet_path"
+                echo "Deleted snippet: $snippet_name"
+            else
+                echo "Snippet not found: $snippet_name"
+                return 1
+            fi
+            return 0
+            ;;
+        -f|--find)
+            if [[ $# -lt 2 ]]; then
+                echo "Please specify the keyword to search."
+                return 1
+            fi
+            keyword="$2"
+            for f in "$HOME/.utilc/snippets/"*.txt; do
+                fname=$(basename "$f" .txt)
+                if [[ "$fname" == *"$keyword"* ]]; then
+                    echo "$fname"
+                fi
+            done
             return 0
             ;;
         *)
@@ -188,6 +213,11 @@ snip()
     esac
 
     # insert snippets
+    if [[ $# -ne 3 ]]; then
+        echo "syntax ERROR. please read this command help --> snip -h or --help"
+        return 1
+    fi
+
     snippet="$1"
     col=${2:-0}
     target="$3".c
