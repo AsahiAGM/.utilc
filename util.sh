@@ -13,17 +13,43 @@ ft()
 
     number="$1"
     probname="$2"
-    mkdir "$number"
+    shift 2
 
-    # ft file
-    cat ~/.utilc/.tmp/tmp.txt > "$number"/"$probname".c
+    mkdir -p "$number"
 
-    # .main file
-    echo -e "#define __SCRIPT__ \"$probname.c\"" > "$number"/.main.c
-    {
-        echo "#define __SCRIPT__ \"$probname.c\""
-        sed "s|{UTILC}|\"$HOME/.utilc/util.h\"|g" ~/.utilc/.tmp/.main.txt
-    } > "$number/.main.c"
+    # single command
+    if [[ $# -eq 0 ]]; then
+        # ft file
+        cat ~/.utilc/.tmp/tmp.txt > "$number"/"$probname".c
+
+        # .main file
+        echo -e "#define __SCRIPT__ \"$probname.c\"" > "$number"/.main.c
+        {
+            echo "#define __SCRIPT__ \"$probname.c\""
+            sed "s|{UTILC}|\"$HOME/.utilc/util.h\"|g" ~/.utilc/.tmp/.main.txt
+        } > "$number/.main.c"
+    fi
+
+    # with option
+    for opt in "$@"; do
+        case "$opt" in
+            -m|--make)
+                # with makefile
+                ftmake "$number"
+                ;;
+            -f|--files)
+                # generate multiple files
+                shift
+                for fname in "$@"; do
+                    cat ~/.utilc/.tmp/tmp.txt > "$number"/"$fname".c
+                done
+                break
+                ;;
+            *)
+                echo "unknown option: $opt"
+                ;;
+        esac
+    done
 }
 
 ftall()
@@ -48,6 +74,44 @@ ftall()
 
     rm -rf a.out
 }
+
+ftmake() {
+    if [[ $1 == "-h" || $1 == "--help" ]]; then
+        cat ~/.utilc/.man/ftmake.txt
+        return 0
+    fi
+
+    dir="."
+    if [[ -n $1 ]]; then
+        dir="$1"
+    fi
+
+    cat > "$dir"/Makefile << 'EOF'
+NAME = a.out
+CC = gcc
+CFLAGS = -g -Wall -Wextra -Werror
+
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+clean:
+	rm -f $(OBJS)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean re
+EOF
+    echo "Makefile created in $dir/"
+}
+
 
 valgc()
 {
@@ -89,6 +153,41 @@ snip()
         return 1
     fi
 
+    # switch option
+    case "$1" in
+        -l|--list)
+            ls ~/.utilc/snippets
+            return 0
+            ;;
+        -e|--edit)
+            if [[ -z $2 ]]; then
+                echo "please specify snippet name"
+                return 1
+            fi
+            vim ~/.utilc/snippets/"$2".c
+            return 0
+            ;;
+        -add)
+            if [[ -z $2 ]]; then
+                echo "please specify new snippet name"
+                return 1
+            fi
+            cp ~/.utilc/.tmp/tmp.txt ~/.utilc/snippets/"$2".c
+            vim ~/.utilc/snippets/"$2".c
+            return 0
+            ;;
+        *)
+            if [[ -f ~/.utilc/snippets/"$1".c ]]; then
+                cat ~/.utilc/snippets/"$1".c
+            else
+                echo "snippet not found: $1"
+                return 1
+            fi
+            return 0
+            ;;
+    esac
+
+    # insert snippets
     snippet="$1"
     col=${2:-0}
     target="$3".c

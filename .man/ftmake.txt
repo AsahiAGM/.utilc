@@ -1,0 +1,14 @@
+man "ftmake"
+--summary--
+generate 42Tokyo-rule Makefile template
+
+--syntax--
+ftmake [target directory] [options]
+
+--param--
+:target directory -- path to directory where Makefile will be created (default is current)
+
+--options--
+ -h, --help   -- show this help
+
+enjoy :)

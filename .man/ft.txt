@@ -1,10 +1,17 @@
 man "ft"
 --summary--
 make working directory "ex" and files
+
 --syntax--
-ft [ex number] [problems name]
+ft [ex number] [problem name] [options]
+
 --param--
-:ex number     -- that is number of probrem
-:problems name -- that is name you going to solute probrem in 42
+:ex number      -- number of the problem (ex00, ex01, ...)
+:problems name  -- name of the problem to solve
+
+--options--
+ -m, --make     -- generate Makefile in the directory
+ -f, --files    -- generate multiple .c files
+ -h, --help     -- show this help
 
 enjoy :)

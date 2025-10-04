@@ -1,11 +1,17 @@
 man "valgc"
 --summary--
-gcc compile and run with valgrind 
+compile target file with gcc and run it under valgrind
+
 --syntax--
 valgc [target]
+
 --param--
-:target -- The file name to compile and run.
+:target -- name of the C file to compile and run (without .c is also accepted)
+
+--options--
+ -h, --help   -- show this help
+
 --hint--
-- If no parameters are given, the files in the current directory are searched for.
+- If no target is given, all .c files in the current directory are compiled and executed.
 
 enjoy :)

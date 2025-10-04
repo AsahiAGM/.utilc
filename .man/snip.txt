@@ -1,11 +1,19 @@
 man "snip"
 --summary--
 insert snippet which any function or sequences
+
 --syntax--
-snip [snippet] [line number] [target file]
+snip [snippet] [line number] [target file] [options]
+
 --param--
-:snippet     -- function or sequences name
-:line number -- The line number where you going to insert the snippet
-:snippet     -- target file name
+:snippet      -- function or sequences name
+:line number  -- the line number where you going to insert the snippet
+:target file  -- target file name
+
+--options--
+ -l, --list   -- show available snippets
+ -e, --edit   -- open snippet file with vim
+ -add         -- create new snippet file
+ -h, --help   -- show this help
 
 enjoy :)
