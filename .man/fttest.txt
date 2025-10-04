@@ -1,0 +1,18 @@
+--summary--
+"42Tokyo" Unit test automation for C projects
+
+--syntax--
+fttest [option] [test_name1 test_name2 ...]
+
+--options--
+ -i, --insert     : insert test templates into .main.c
+ -r, --run        : run tests via _fttest_.c + valgc
+ -k, --keep       : keep _fttest_.c and binary after run
+ -h, --help       : show this help
+
+--hint--
+- Place your test templates in ~/.utilc/.tests/*.tmp
+- Use 'fttest init' to create standard templates
+- {placeholder} in templates will be replaced by function calls
+
+enjoy :)

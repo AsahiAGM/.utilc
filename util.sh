@@ -171,6 +171,42 @@ snip()
             vim ~/.utilc/snippets/"$3".txt
             return 0
             ;;
+        -m|--multi)
+            if [[ $# -lt 4 ]]; then
+                echo "Usage: snip -m [target filename] [line number] [snippet1 snippet2 ...]"
+                return 1
+            fi
+
+            target="$2".c
+            col="$3"
+            shift 3
+
+            if [[ ! -f "$target" ]]; then
+                echo "Target file not found: $target"
+                return 1
+            fi
+
+            for snippet in "$@"; do
+                snippet_path="$HOME/.utilc/snippets/${snippet}.txt"
+                if [[ ! -f "$snippet_path" ]]; then
+                    echo "Warning: snippet not found -> $snippet"
+                    continue
+                fi
+
+                if [[ "$col" -eq 0 ]]; then
+                    # insert head
+                    cat "$snippet_path" "$target" > "$target.tmp" && mv "$target.tmp" "$target"
+                else
+                    # insert specified line
+                    sed -i "${col}r $snippet_path" "$target"
+                fi
+
+                echo "Inserted $snippet into $target at line $col"
+            done
+
+            echo "✅ Multiple snippets inserted successfully."
+            return 0
+            ;;   
         -d|--delete)
             if [[ $# -lt 2 ]]; then
                 echo "Please specify the snippet name to delete."
@@ -229,12 +265,193 @@ snip()
     fi
 
     if [ "$col" -eq 0 ]; then
-        # 先頭に挿入
+        # insert head
         cat "$snippet_path" "$target" > "$target.tmp" && mv "$target.tmp" "$target"
     else
-        # 指定行に挿入
+        # insert specified line
         sed -i "${col}r $snippet_path" "$target"
     fi
 
     echo "Inserted $snippet into $target at line $col"
+}
+
+fttest() {
+    local cmd
+    local keep_flag=0
+    local tests=()
+
+    # コマンドライン解析
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -i|--insert)
+                cmd="insert"
+                shift
+                ;;
+            -r|--run)
+                cmd="run"
+                shift
+                ;;
+            -k|--keep)
+                keep_flag=1
+                shift
+                ;;
+            -h|--help)
+
+                cat ~/.utilc/.man/fttest.txt
+                return 0
+                ;;
+            init)
+                echo "Initializing standard test templates..."
+                mkdir -p ~/.utilc/.tests
+                # 例: limit_test.tmp
+                [[ ! -f ~/.utilc/.tests/limit_test.tmp ]] && cat > ~/.utilc/.tests/limit_test.tmp <<'EOF'
+printf("[limit_test: INT_MAX] => %d\n", {placeholder}(INT_MAX));
+printf("[limit_test: INT_MIN] => %d\n", {placeholder}(INT_MIN));
+EOF
+                [[ ! -f ~/.utilc/.tests/null_test.tmp ]] && cat > ~/.utilc/.tests/null_test.tmp <<'EOF'
+printf("[null_test] => %d\n", {placeholder}(NULL));
+EOF
+                echo "Templates generated in ~/.utilc/.tests/"
+                return 0
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+
+    # 処理確認
+    if [[ -z "$cmd" ]]; then
+        echo "No command specified. Use -h for help."
+        return 1
+    fi
+
+    echo "Command: $cmd"
+    echo "Keep flag: $keep_flag"
+    echo "Tests: ${tests[*]}"
+
+    # insert mode
+    if [[ "$cmd" == "insert" ]]; then
+        local target_func="$1"
+        shift
+        local tests=("$@")
+
+        local src_file="${target_func}.c"
+        local target_file
+        target_file=$(find . -maxdepth 1 -name "*.main.c" | head -n 1)
+
+        if [[ ! -f "$src_file" ]]; then
+            echo "Error: source file '$src_file' not found."
+            return 1
+        fi
+        if [[ -z "$target_file" ]]; then
+            echo "Error: no .main.c file found in current directory."
+            return 1
+        fi
+
+        echo "Target function: $target_func"
+        echo "Source: $src_file"
+        echo "Target main: $target_file"
+        echo "Tests: ${tests[*]}"
+
+        # === 1. プロトタイプ抽出 ===
+        local func_header
+        func_header=$(grep -E "^[a-zA-Z_][a-zA-Z0-9_[:space:]\*]*[[:space:]]+$target_func[[:space:]]*\(.*\)" "$src_file" \
+            | head -n 1 | sed 's/[[:space:]]*{[[:space:]]*$//')
+
+        if [[ -z "$func_header" ]]; then
+            echo "Error: Function '$target_func' not found in $src_file"
+            return 1
+        fi
+
+        # === 2. プロトタイプ挿入 ===
+        local include_last proto_line
+        include_last=$(grep -n '^#include' "$target_file" | tail -n 1 | cut -d: -f1)
+        proto_line=$((include_last + 2))
+
+        if grep -q "$target_func" "$target_file"; then
+            echo "Prototype already exists for $target_func (skipped)"
+        else
+            sed "${proto_line}i /* prototype for test */\n${func_header};" "$target_file" > "$target_file.tmp"
+            mv "$target_file.tmp" "$target_file"
+            echo "Inserted prototype for '$target_func' at line $proto_line"
+        fi
+
+        # === 3. テスト挿入 ===
+        local insert_line
+        insert_line=$(grep -n 'return *(0)' "$target_file" | tail -n 1 | cut -d: -f1)
+        insert_line=$((insert_line - 2))
+
+        for test in "${tests[@]}"; do
+            local test_file="$HOME/.utilc/.tests/${test}.tmp"
+            if [[ -f "$test_file" ]]; then
+                # placeholder を対象関数名に置換して挿入
+                sed "s/{placeholder}/$target_func/g" "$test_file" | \
+                    sed "${insert_line}r /dev/stdin" "$target_file" > "$target_file.tmp"
+                mv "$target_file.tmp" "$target_file"
+                echo "Inserted test '$test' into main"
+            else
+                echo "Warning: test template '${test}.tmp' not found"
+            fi
+        done
+
+        echo "✅ Insert complete."
+        return 0
+    fi
+
+    # run mode
+    if [[ "$cmd" == "run" ]]; then
+        if [[ ${#tests[@]} -eq 0 ]]; then
+            echo "No tests specified for run."
+            return 1
+        fi
+
+        local target_file=".main.c"
+        if [[ ! -f "$target_file" ]]; then
+            echo "$target_file not found! Create or generate it first."
+            return 1
+        fi
+
+        local ft_file="_fttest_.c"
+        > "$ft_file"
+
+        # 1. 共通ヘッダ挿入
+        echo '#include "~/.utilc/util.h"' >> "$ft_file"
+
+        # 2. 対象Cファイルリンク
+        echo "#include \"$target_file\"" >> "$ft_file"
+
+        # 3. 関数宣言抽出
+        grep -E '^[a-zA-Z_][a-zA-Z0-9_]* [a-zA-Z_][a-zA-Z0-9_]*\s*\(.*\)' "$target_file" | \
+            awk '{print $1, $2}' | sed 's/$/;/' >> "$ft_file"
+
+        # 4. main関数にテストコードを挿入
+        echo "int main(void) {" >> "$ft_file"
+        for test in "${tests[@]}"; do
+            local tmp_path="$HOME/.utilc/.tests/${test}.tmp"
+            if [[ ! -f "$tmp_path" ]]; then
+                echo "Test template not found: $tmp_path"
+                continue
+            fi
+            # placeholder を関数名に置換
+            local func_name
+            func_name=$(grep -E '^[a-zA-Z_][a-zA-Z0-9_]* [a-zA-Z_][a-zA-Z0-9_]*\s*\(.*\)' "$target_file" | head -n1 | awk '{print $2}' | sed 's/(.*//')
+            sed "s/{placeholder}/$func_name/g" "$tmp_path" >> "$ft_file"
+        done
+        echo "return 0;" >> "$ft_file"
+        echo "}" >> "$ft_file"
+
+        # 5. valgcでコンパイル＆実行
+        valgc "$ft_file"
+
+        # 6. クリーンアップ
+        if [[ $keep_flag -eq 0 ]]; then
+            rm -f "$ft_file" _fttest_
+        else
+            echo "Keep flag set: $ft_file and binary retained."
+        fi
+
+        return 0
+    fi
+
 }

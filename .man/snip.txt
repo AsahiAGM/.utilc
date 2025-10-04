@@ -18,6 +18,19 @@ snip [snippet] [line number] [target file] [options]
  -f, --find                    -- Search for snippets by keyword
  -h, --help                    -- show this help
 
+ -m, --multi [target file] [line number] [snippet1 snippet2 ...]
+                               -- insert multiple snippets in order
+    Insert multiple snippets into a single target file at once.
+    You can specify as many snippet names as you like; they will
+    be inserted sequentially at the specified position.
+
+    Example:
+    snip -m main 0 swap sort minmax
+        → inserts swap.txt, sort.txt, minmax.txt at the top of main.c
+
+    snip -m main 45 quicksort merge bubble
+        → inserts quicksort.txt, merge.txt, bubble.txt after line 45
+
 --hint--
 - For insertion, specify the snippet name, line number, and target file.
 - When adding, provide a source file and new snippet name.
@@ -25,5 +38,7 @@ snip [snippet] [line number] [target file] [options]
 - Editing opens the snippet in vim.
 - Deletion removes the snippet permanently.
 - Searching lists snippets whose filename or content matches the keyword.
+- Use '-m' when you want to insert multiple snippets at once.
+  For example: snip -m main 0 utils_init utils_free
 
 enjoy :)

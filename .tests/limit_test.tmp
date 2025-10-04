@@ -1,0 +1,2 @@
+    printf("[limit_test: INT_MAX] => %d\n", {placeholder}(INT_MAX));
+    printf("[limit_test: INT_MIN] => %d\n", {placeholder}(INT_MIN));
